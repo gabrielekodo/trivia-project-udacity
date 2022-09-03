@@ -1,6 +1,5 @@
 # Full Stack API Final Project
 
-
 ## Full Stack Trivia
 
 Udacity is invested in creating bonding experiences for its employees and students. A bunch of team members got the idea to hold trivia on a regular basis and created a webpage to manage the trivia app and play the game, but their API experience is limited and still needs to be built out.
@@ -13,15 +12,15 @@ That's where I come in to help them finish the trivia app so they can start hold
 4. Search for questions based on a text query string.
 5. Play the quiz game, randomizing either all questions or within a specific category.
 
-
 ### Backend
 
 ## Endpoints
 
 ### GET `/categories`
+
 - Fetches a dictionary of categories in which the keys are the ids and the value is the corresponding string of the category.
 - Request arguments: None.
-- Returns:  An object with these keys:
+- Returns: An object with these keys:
   - `success`: The success flag
   - `categories`: Contains a object of `id:category_string` and `key:value pairs`.
 
@@ -40,6 +39,7 @@ That's where I come in to help them finish the trivia app so they can start hold
 ```
 
 ### GET `/questions`
+
 - Fetches:
   - A list of questions (paginated by 10 items)
   - A dictionary of categories
@@ -71,7 +71,7 @@ That's where I come in to help them finish the trivia app so they can start hold
       "difficulty": 4,
       "id": 4,
       "question": "What actor did author Anne Rice first denounce, then praise in the role of her beloved Lestat?"
-    },
+    }
   ],
   "categories": {
     "1": "Science",
@@ -82,11 +82,12 @@ That's where I come in to help them finish the trivia app so they can start hold
     "6": "Sports"
   },
   "total_questions": 10,
-  "current_category": null,
+  "current_category": null
 }
 ```
 
 ### DELETE `/questions/:question_id/`
+
 - Delete question using a question ID
 - Request arguments:
   - `question_id` (integer): The question id
@@ -97,11 +98,12 @@ That's where I come in to help them finish the trivia app so they can start hold
 ```json
 {
   "success": true,
-  "deleted": 1,
+  "deleted": 1
 }
 ```
 
 ### POST `/questions`
+
 - Create a new question.
 - Request arguments:
   - `question` (string) - The question
@@ -115,11 +117,12 @@ That's where I come in to help them finish the trivia app so they can start hold
 ```json
 {
   "success": true,
-  "created": 1,
+  "created": 1
 }
 ```
 
 ### POST `questions/search`
+
 - Search a question.
 - Request arguments:
   - `search` (string) - The term to search
@@ -146,15 +149,15 @@ That's where I come in to help them finish the trivia app so they can start hold
       "difficulty": 4,
       "id": 4,
       "question": "What actor did author Anne Rice first denounce, then praise in the role of her beloved Lestat?"
-    },
+    }
   ],
   "total_questions": 10,
-  "current_category": null,
+  "current_category": null
 }
 ```
 
-
 ### GET `/categories/:category_id/questions`
+
 - Fetches a list of questions based on category.
 - Request arguments:
   - `category_id` (integer): The category id
@@ -181,14 +184,15 @@ That's where I come in to help them finish the trivia app so they can start hold
       "difficulty": 4,
       "id": 4,
       "question": "What actor did author Anne Rice first denounce, then praise in the role of her beloved Lestat?"
-    },
+    }
   ],
   "total_questions": 10,
-  "current_category": 1,
+  "current_category": 1
 }
 ```
 
 ### POST `/quizzes`
+
 - Fetches a question to play the quiz.
 - Request arguments:
   - `quiz_category` (dictionary): The quiz category with the `type` and the `id`.
@@ -200,7 +204,7 @@ That's where I come in to help them finish the trivia app so they can start hold
 ```json
 {
   "success": true,
-  "question":{
+  "question": {
     "answer": "Apollo 13",
     "category": 5,
     "difficulty": 4,
@@ -213,6 +217,7 @@ That's where I come in to help them finish the trivia app so they can start hold
 ## Errors
 
 ### Error 400
+
 - Returns an object with these keys: `success`, `error` and `message`.
 
 ```json
@@ -224,6 +229,7 @@ That's where I come in to help them finish the trivia app so they can start hold
 ```
 
 ### Error 404
+
 - Returns an object with these keys: `success`, `error` and `message`.
 
 ```json
@@ -235,6 +241,7 @@ That's where I come in to help them finish the trivia app so they can start hold
 ```
 
 ### Error 422
+
 - Returns an object with these keys: `success`, `error` and `message`.
 
 ```json
@@ -246,6 +253,7 @@ That's where I come in to help them finish the trivia app so they can start hold
 ```
 
 ### Error 500
+
 - Returns an object with these keys: `success`, `error` and `message`.
 
 ```json
@@ -256,5 +264,14 @@ That's where I come in to help them finish the trivia app so they can start hold
 }
 ```
 
+### Error 405
 
+- Returns an object with these keys: `success`, `error` and `message`.
 
+```json
+{
+  "success": false,
+  "error": 500,
+  "message": "method not allowed"
+}
+```
