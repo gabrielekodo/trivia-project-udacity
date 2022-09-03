@@ -14,7 +14,6 @@ QUESTIONS_PER_PAGE = 10
 CATEGORY_ALL = '0'
 
 
-
 def get_ids_from_questions(questions, previous_ids):
     '''
     First create a formatted list of the current questions
@@ -26,6 +25,7 @@ def get_ids_from_questions(questions, previous_ids):
     ids = list(set(current_ids).difference(previous_ids))
 
     return ids
+
 
 def paginate_questions(request, selection):
     page = request.args.get("page", 1, type=int)
@@ -78,7 +78,7 @@ def create_app(test_config=None):
 
         return jsonify({
             "categories": categories,
-            "success":True
+            "success": True
         })
     '''
   @TODO: 
@@ -139,7 +139,7 @@ def create_app(test_config=None):
             return jsonify({
                 "success": True,
                 "questions": current_questions,
-                "deleted":question_id,
+                "deleted": question_id,
                 "total_questions": len(Question.query.all())
             })
 
@@ -207,17 +207,15 @@ def create_app(test_config=None):
 
             print(search_term)
             print(questions_searched)
-        
 
             return jsonify({
-                "success":True,
+                "success": True,
                 "total_questions": len(questions_searched),
                 "questions": questions_searched,
                 "current_category": None
             })
         except Exception:
             abort(422)
-
 
     '''
   @TODO: 
@@ -234,7 +232,7 @@ def create_app(test_config=None):
                 Question.category == category_id).order_by(Question.id).all()
             current_questions = paginate_questions(request, selection)
             current_category = format(Category.query.get(category_id))
-            
+
             if len(current_questions) == 0:
                 abort(404)
             return jsonify({
@@ -261,51 +259,46 @@ def create_app(test_config=None):
   and shown whether they were correct or not. 
   '''
     @app.route('/quizzes', methods=['POST'])
-    def retrieve_quizzes():
+    def retrieve_quiz_questions():
         '''
         Endpoint to get questions to play the quiz.
         '''
-        try:
-            # Get raw data
-            questions = None
-            body = request.get_json()
-            quiz_category = body.get('quiz_category', None)
-            previous_ids = body.get('previous_questions', None)
-            category_id = quiz_category.get('id')
+        body = request.get_json()
 
-            # Check category
-            if category_id == CATEGORY_ALL:
-                # Get all the questions
-                questions = Question.query.all()
+        previous_questions = body.get('previous_questions', None)
+        current_category = body.get('quiz_category', None)
+
+        if not previous_questions:
+            if current_category and current_category['id'] != 0:
+                # if no list of previous questions but only category then pick random question from category.
+                questions_raw = (Question.query
+                                 .filter(Question.category == str(current_category['id']))
+                                 .all())
             else:
-                # Get the questions by the requested category
-                questions = Question.query \
-                    .filter(Question.category == category_id) \
-                    .all()
-
-            # Getting list of ids
-            ids = get_ids_from_questions(questions, previous_ids)
-
-            if len(ids) == 0:
-                # for empty list return no question
-                return jsonify({
-                    'success': True,
-                    'question': None
-                })
+                # if no list and no category
+                questions_raw = (Question.query.all())
+        else:
+            if current_category and current_category['id'] != 0:
+                # if a question list and a category are present , get questions that are not in previous list
+                questions_raw = (Question.query
+                                 .filter(Question.category == str(current_category['id']))
+                                 .filter(Question.id.notin_(previous_questions))
+                                 .all())
             else:
-                # Choice a random id
-                random_id = random.choice(ids)
 
-                # Get the question
-                question = Question.query.get(random_id)
+                questions_raw = (Question.query
+                                 .filter(Question.id.notin_(previous_questions))
+                                 .all())
 
-                return jsonify({
-                    'success': True,
-                    'question': question.format()
-                })
+        formatted_questions = [question.format() for question in questions_raw]
+        chosen_random_question = formatted_questions[random.randint(
+            0, len(formatted_questions)-1)]
 
-        except Exception:
-            abort(422)
+        return jsonify({
+            'success': True,
+            'question': chosen_random_question
+        })
+
     '''
   @TODO: 
   Create error handlers for all expected errors 
