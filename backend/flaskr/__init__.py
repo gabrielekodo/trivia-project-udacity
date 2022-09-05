@@ -254,8 +254,7 @@ def create_app(test_config=None):
         Endpoint to get questions to play the quiz.
         '''
         body = request.get_json()
-        if not body:
-            abort() 
+        
         
         previous_questions = body.get('previous_questions', None)
         current_category = body.get('quiz_category', None)
