@@ -11,20 +11,10 @@ from models import setup_db, db, Question, Category
 collections.Iterable = collections.abc.Iterable
 
 QUESTIONS_PER_PAGE = 10
-CATEGORY_ALL = '0'
 
 
-def get_ids_from_questions(questions, previous_ids):
-    '''
-    First create a formatted list of the current questions
-    And then compare both list and return a list of ids
-    '''
-    questions_formatted = [q.format() for q in questions]
-    current_ids = [q.get('id') for q in questions_formatted]
 
-    ids = list(set(current_ids).difference(previous_ids))
 
-    return ids
 
 
 def paginate_questions(request, selection):
@@ -264,39 +254,38 @@ def create_app(test_config=None):
         Endpoint to get questions to play the quiz.
         '''
         body = request.get_json()
-
+        if not body:
+            abort() 
+        
         previous_questions = body.get('previous_questions', None)
         current_category = body.get('quiz_category', None)
-
-        if not previous_questions:
-            if current_category and current_category['id'] != 0:
-                # if no list of previous questions but only category then pick random question from category.
-                questions_raw = (Question.query
-                                 .filter(Question.category == str(current_category['id']))
-                                 .all())
+        if len(previous_questions) ==0:
+        
+            if current_category['id'] ==0:
+                questions=Question.query.all()
+                
             else:
-                # if no list and no category
-                questions_raw = (Question.query.all())
+                questions=Question.query.filter(Question.category==str(current_category['id'])).all()    
+                
+
         else:
-            if current_category and current_category['id'] != 0:
-                # if a question list and a category are present , get questions that are not in previous list
-                questions_raw = (Question.query
-                                 .filter(Question.category == str(current_category['id']))
-                                 .filter(Question.id.notin_(previous_questions))
-                                 .all())
+            if current_category['id'] !=0:
+                questions=(Question.query.filter(Question.category == str(current_category['id']))
+                                         .filter(Question.id.notin_(previous_questions))
+                                          .all())
             else:
+                questions = (Question.query.filter(Question.id.notin_(previous_questions))
+                             .all())
 
-                questions_raw = (Question.query
-                                 .filter(Question.id.notin_(previous_questions))
-                                 .all())
+     
 
-        formatted_questions = [question.format() for question in questions_raw]
-        chosen_random_question = formatted_questions[random.randint(
-            0, len(formatted_questions)-1)]
+        formatted_questions = [question.format() for question in questions]
+        
 
         return jsonify({
             'success': True,
-            'question': chosen_random_question
+            'question': formatted_questions[random.randint(
+                0, len(formatted_questions)-1)]
         })
 
     '''
